@@ -26,7 +26,7 @@ import org.l2jmobius.gameserver.network.OutgoingPackets;
  * ExReplySentPost packet implementation.
  * @author Migi, DS
  */
-public class ExReplySentPost extends AbstractItemPacket
+public class ExReplySentPost implements IClientOutgoingPacket
 {
 	private final Message _msg;
 	private ItemInstance[] _items = null;
@@ -63,8 +63,30 @@ public class ExReplySentPost extends AbstractItemPacket
 			packet.writeD(_items.length);
 			for (ItemInstance item : _items)
 			{
-				writeItem(packet, item);
-				packet.writeD(item.getObjectId());
+				packet.writeH(item.getItem().getType2());
+				packet.writeD(0x00); // unknown
+				packet.writeD(item.getId());
+				packet.writeQ(item.getCount());
+				packet.writeD(item.getEnchantLevel());
+				packet.writeH(item.getCustomType2());
+				packet.writeH(0x00); // unknown
+				packet.writeD(0x00); // unknown
+				
+				packet.writeD(item.isAugmented() ? item.getAugmentation().getAugmentationId() : 0x00);
+				
+				packet.writeD(0x00); // unknown
+				
+				packet.writeH(item.getAttackElementType());
+				packet.writeH(item.getAttackElementPower());
+				for (byte i = 0; i < 6; i++)
+				{
+					packet.writeH(item.getElementDefAttr(i));
+				}
+				
+				for (int op : item.getEnchantOptions())
+				{
+					packet.writeH(op);
+				}
 			}
 			packet.writeQ(_msg.getReqAdena());
 			packet.writeD(_msg.getSendBySystem());

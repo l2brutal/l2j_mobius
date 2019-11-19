@@ -25,7 +25,7 @@ import org.l2jmobius.gameserver.network.OutgoingPackets;
  * @author Migi, DS
  */
 
-public class ExReplyPostItemList extends AbstractItemPacket
+public class ExReplyPostItemList implements IClientOutgoingPacket
 {
 	PlayerInstance _player;
 	private final ItemInstance[] _itemList;
@@ -43,7 +43,26 @@ public class ExReplyPostItemList extends AbstractItemPacket
 		packet.writeD(_itemList.length);
 		for (ItemInstance item : _itemList)
 		{
-			writeItem(packet, item);
+			packet.writeD(item.getObjectId());
+			packet.writeD(item.getId());
+			packet.writeQ(item.getCount());
+			packet.writeH(item.getItem().getType2());
+			packet.writeH(item.getCustomType1());
+			packet.writeD(item.getItem().getBodyPart());
+			packet.writeH(item.getEnchantLevel());
+			packet.writeH(item.getCustomType2());
+			
+			packet.writeH(item.getAttackElementType());
+			packet.writeH(item.getAttackElementPower());
+			for (byte i = 0; i < 6; i++)
+			{
+				packet.writeH(item.getElementDefAttr(i));
+			}
+			
+			for (int op : item.getEnchantOptions())
+			{
+				packet.writeH(op);
+			}
 		}
 		return true;
 	}
